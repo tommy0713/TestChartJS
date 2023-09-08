@@ -24,7 +24,7 @@
 
     <br><br>
 
-    <div style="width: 600px; height: 300px;" id="test">
+    <div style="width: 600px; height: 300px;">
         <canvas id="myChart"></canvas>
     </div>
 
@@ -61,9 +61,11 @@
             //$("#putPic").remove();
         })
 
+        console.log(myChart)
 
         $("#aa").click(() => {
             showChart('bar');
+            console.log(myChart)
         })
 
         $("#bb").click(() => {
@@ -124,7 +126,7 @@
             }
         });
 
-        function test(x) {
+        function createChart(x) {
             return new Chart(ctx, {
                 type: x,
                 data: {
@@ -177,7 +179,7 @@
             if (myChart) {
                 myChart.destroy();
             }
-            myChart = test(`${x}`)
+            myChart = createChart(`${x}`)
             $('#pic').show();
         }
 
