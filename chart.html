@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        button:hover {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="aa">bar</button>
+    <button id="bb">line</button>
+    <button id="cc">pie</button>
+    <button id="dd">doughnut</button>
+    <button id="Excel">Excel</button>
+    <button id="odss">ods</button>
+    <button id="pic">下載</button>
+    <!-- <button id="sweet">sweet</button> -->
+
+    <br><br>
+
+    <div style="width: 600px; height: 300px;" id="test">
+        <canvas id="myChart"></canvas>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ods-js/1.2.0/ods.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        const ctx = document.getElementById('myChart');
+
+        var myChart = null;
+
+        var canvas = document.getElementById('myChart');
+        //var dataURL = canvas.toDataURL("image/jpeg");
+        //console.log(dataURL)
+
+        $('#pic').hide();
+        $('#pic').click(() => {
+            // 创建一个链接元素
+            var downloadLink = document.createElement('a');
+
+            // 将Canvas内容转换为DataURL
+            var imageDataURL = canvas.toDataURL('image/jpg');
+
+            // 设置链接的下载属性和文件名
+            downloadLink.href = imageDataURL;
+            downloadLink.download = 'chart.jpg';
+
+            // 模拟用户点击链接以触发下载
+            downloadLink.click();
+            $('#pic').hide();
+            //$("#putPic").remove();
+        })
+
+
+        $("#aa").click(() => {
+            showChart('bar');
+        })
+
+        $("#bb").click(() => {
+            showChart('line');
+        })
+
+        $("#cc").click(() => {
+            showChart('pie');
+        })
+
+        $("#dd").click(() => {
+            showChart('doughnut');
+        })
+
+        $("#Excel").click(() => {
+            downloadFile('xlsx')
+        })
+
+        $('#odss').click(() => {
+            downloadFile('ods');
+        })
+
+        $('#sweet').click(() => {
+            Swal.fire({
+                title: '下載成功',
+                icon: 'success',
+                confirmButtonText: '確定'
+            })
+        })
+        var keysList = [];
+        var valuesList = [];
+        var dataArray = [];
+
+        $.ajax({
+            url: 'test.txt', // 指定要请求的JSON文件的URL
+            method: 'GET', // 使用GET方法获取文件
+            dataType: 'json', // 声明预期的响应数据类型为JSON
+            success: function (data) { // 请求成功时执行的回调函数
+                // 在这里处理从服务器获取的JSON数据
+                console.log(data);
+                console.log(dataArray)
+                for (var key in data) {
+                    if (data.hasOwnProperty(key)) {
+                        keysList.push(key);
+                        valuesList.push(data[key]);
+                    }
+                }
+
+                for (var key in data) {
+                    if (data.hasOwnProperty(key)) {
+                        dataArray.push([key, data[key]]);
+                    }
+                }
+
+            },
+            error: function (jqXHR, textStatus, errorThrown) { // 请求失败时执行的回调函数
+                console.error(textStatus, errorThrown);
+            }
+        });
+
+        function test(x) {
+            return new Chart(ctx, {
+                type: x,
+                data: {
+                    //labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],//json的key
+                    labels: keysList,
+                    datasets: [{
+                        //data: [12, 19, 3, 5, 2, 3],//json的value
+                        data: valuesList,
+                        borderWidth: 1,
+                        backgroundColor: [
+                            'Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'
+                        ],
+                        borderColor: [
+                            'Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'
+                        ],
+                        label: 'Bar Dataset', // 添加图例标签
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false, // 是否显示图例
+                            position: 'right', // 图例的位置：top, bottom, left, right
+                        }
+                    }
+                }
+            });
+        }
+
+        function downloadFile(x) {
+            var wb = XLSX.utils.book_new();
+            var ws = XLSX.utils.aoa_to_sheet([['Key', 'Value']].concat(dataArray));
+            XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+            var currentDate = new Date();
+            var dateString = `${currentDate.getFullYear()}年${currentDate.getMonth()}月${currentDate.getDate()}日${currentDate.getHours()}點${currentDate.getMinutes()}分${currentDate.getSeconds()}秒`;
+            XLSX.writeFile(wb, `${dateString}.${x}`);
+            Swal.fire({
+                title: '下載成功',
+                icon: 'success',
+                confirmButtonText: '確定'
+            })
+        }
+
+        function showChart(x) {
+            if (myChart) {
+                myChart.destroy();
+            }
+            myChart = test(`${x}`)
+            $('#pic').show();
+        }
+
+    </script>
+
+</body>
+
+</html>

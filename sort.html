@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var keysList = [];
+        var valuesList = [];
+        $.ajax({
+            url: 'test.txt', // 指定要请求的JSON文件的URL
+            method: 'GET', // 使用GET方法获取文件
+            dataType: 'json', // 声明预期的响应数据类型为JSON
+            success: function (data) { // 请求成功时执行的回调函数
+                // 在这里处理从服务器获取的JSON数据
+                console.log(data);
+                console.log(data);
+
+                // 将 JSON 对象转换为数组，以便排序
+                const dataArray = Object.entries(data);
+
+                // 根据数量（值）进行升序排序
+                dataArray.sort((a, b) => a[1] - b[1]);
+
+                const sortedJson = Object.fromEntries(dataArray);
+
+                // 将 JSON 对象转换为 JSON 字符串
+                const jsonString = JSON.stringify(sortedJson);
+                // 打印排序后的结果
+                console.log(sortedJson);
+
+                console.log(jsonString);
+            },
+            error: function (jqXHR, textStatus, errorThrown) { // 请求失败时执行的回调函数
+                console.error(textStatus, errorThrown);
+            }
+        });
+    </script>
+</body>
+
+</html>

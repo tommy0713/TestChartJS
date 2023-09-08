@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <button id="Excel">Excel</button>
+    <button id="ods">Ods</button>
+    <button id="doc">Doc</button>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/blob.js/1.1.2/Blob.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.18.0/docxtemplater.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+
+
+    <script>
+        $("#Excel").click(() => {
+            var workbook = XLSX.utils.book_new();
+            var ws = XLSX.utils.json_to_sheet(dataArray);
+            XLSX.utils.book_append_sheet(workbook, ws, "Sheet1");
+            var currentDate = new Date();
+            var dateString = `${currentDate.getFullYear()}年${currentDate.getMonth()}月${currentDate.getDate()}日${currentDate.getHours()}點${currentDate.getMinutes()}分${currentDate.getSeconds()}秒`;
+            XLSX.writeFile(workbook, `${dateString}.xlsx`);
+        })
+
+        $("#ods").click(() => {
+            var workbook = XLSX.utils.book_new();
+            var ws = XLSX.utils.json_to_sheet(dataArray);
+            XLSX.utils.book_append_sheet(workbook, ws, "Sheet1");
+
+            var currentDate = new Date();
+            //var dateString = currentDate.toISOString(); // 格式化日期时间
+
+            var dateString = `${currentDate.getFullYear()}年${currentDate.getMonth()}月${currentDate.getDate()}日${currentDate.getHours()}點${currentDate.getMinutes()}分${currentDate.getSeconds()}秒`;
+
+            // 将 Excel 文件保存为文件下载
+            XLSX.writeFile(workbook, `${dateString}.ods`);
+        })
+
+        $("#doc").click(() => {
+            var template = new docxtemplater();
+            template.loadZip(new JSZip(dataArray));
+            var data = {
+                jsonData,
+            };
+
+            const wordBlob = template.getZip().generate({ type: 'blob' });
+            const wordFile = new File([wordBlob], 'output.docx', { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+
+            writeFile(wordFile, 'output.docx');
+        });
+
+        var dataArray = [];
+
+        $.ajax({
+            url: 'gameList.txt',
+            method: "GET",
+            dataType: "json",
+            success: function (data) {
+                dataArray = data;
+            },
+            error: function (jqXHR, textStatus, errorThrown) { // 请求失败时执行的回调函数
+                console.log(textStatus);
+            }
+        })
+    </script>
+</body>
+
+</html>
